@@ -1,6 +1,14 @@
+"use client"
+// import { useState } from "react";
+
 const LikePage = () => {
+// const [name, setName] = useState("Hoi Dan IT")
+
+    const handleClick = () => {
+        alert("me")
+    }
     return (
-        <div>
+        <div onClick={() => handleClick()}>
             like apge
         </div>
     )
