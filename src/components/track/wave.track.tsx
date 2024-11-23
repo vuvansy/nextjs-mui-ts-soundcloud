@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useSearchParams } from 'next/navigation';
 import { useWavesurfer } from "@/utils/customHook";
 
@@ -21,10 +21,38 @@ const WaveTrack = () => {
     }, []);
 
     const wavesurfer = useWavesurfer(containerRef, optionsMemo);
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
+
+    // Initialize wavesurfer when the container mounts
+    // or any of the props change
+    useEffect(() => {
+        if (!wavesurfer) return
+        setIsPlaying(false)
+        const subscriptions = [
+            wavesurfer.on('play', () => setIsPlaying(true)),
+            wavesurfer.on('pause', () => setIsPlaying(false)),
+        ]
+        return () => {
+            subscriptions.forEach((unsub) => unsub())
+        }
+    }, [wavesurfer])
+
+    // On play button click
+    //useCallback không chạy lại khối code nếu biến số không thay đổi
+    const onPlayClick = useCallback(() => {
+        if (wavesurfer) {
+            wavesurfer.isPlaying() ? wavesurfer.pause() : wavesurfer.play();
+        }
+    }, [wavesurfer]);
 
     return (
-        <div ref={containerRef}>
-            wave track
+        <div>
+            <div ref={containerRef}>
+                wave track
+            </div>
+            <button onClick={() => onPlayClick()}>
+                {isPlaying === true ? "Pause" : "Play"}
+            </button>
         </div>
     )
 }
