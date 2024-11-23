@@ -101,6 +101,36 @@ const WaveTrack = () => {
         return `${minutes}:${paddedSeconds}`
     }
 
+    const arrComments = [
+        {
+            id: 1,
+            avatar: "http://localhost:8000/images/chill1.png",
+            moment: 10,
+            user: "username 1",
+            content: "just a comment1"
+        },
+        {
+            id: 2,
+            avatar: "http://localhost:8000/images/chill1.png",
+            moment: 30,
+            user: "username 2",
+            content: "just a comment3"
+        },
+        {
+            id: 3,
+            avatar: "http://localhost:8000/images/chill1.png",
+            moment: 50,
+            user: "username 3",
+            content: "just a comment3"
+        },
+    ]
+
+    //fc tính toán vị trí comment hiện tại moment
+    const calLeft = (moment: number) => {
+        const hardCodeDuration = 199;
+        const percent = (moment / hardCodeDuration) * 100;
+        return `${percent}%`
+    }
 
     return (
         <div style={{ marginTop: 20 }}>
@@ -185,6 +215,27 @@ const WaveTrack = () => {
                                 backdropFilter: "brightness(0.5)"
                             }}
                         ></div>
+                        <div className="comments"
+                            style={{ position: "relative" }}
+                        >
+                            {
+                                arrComments.map(item => {
+                                    return (
+                                        <img
+                                            key={item.id}
+                                            style={{
+                                                height: 20, width: 20,
+                                                position: "absolute",
+                                                top: 71,
+                                                zIndex: 20,
+                                                left: calLeft(item.moment)
+                                            }}
+                                            src={`http://localhost:8000/images/chill1.png`}
+                                        />
+                                    )
+                                })
+                            }
+                        </div>
                     </div>
                 </div>
                 <div className="right"
