@@ -44,8 +44,8 @@ const WaveTrack = () => {
         return {
             waveColor: gradient,
             progressColor: progressGradient,
-            height: 150,
-            barWidth: 2,
+            height: 100,
+            barWidth: 3,
             url: `/api?audio=${fileName}`,
         }
     }, []);
@@ -56,11 +56,8 @@ const WaveTrack = () => {
     // Initialize wavesurfer when the container mounts
     // or any of the props change
     useEffect(() => {
-        if (!wavesurfer) return
-        setIsPlaying(false)
-
-        const timeEl = document.querySelector('#time')!;
-        const durationEl = document.querySelector('#duration')!; //jquery
+        if (!wavesurfer) return;
+        setIsPlaying(false);
 
         const hover = hoverRef.current!;
         const waveform = containerRef.current!;
@@ -106,6 +103,16 @@ const WaveTrack = () => {
                 <div className="time" >{time}</div>
                 <div className="duration" >{duration}</div>
                 <div ref={hoverRef} className="hover-wave"></div>
+                <div className="overlay"
+                    style={{
+                        position: "absolute",
+                        height: "30px",
+                        width: "100%",
+                        bottom: "0",
+                        background: "#ccc"
+                    }}
+                ></div>
+
             </div>
             <button onClick={() => onPlayClick()}>
                 {isPlaying === true ? "Pause" : "Play"}
