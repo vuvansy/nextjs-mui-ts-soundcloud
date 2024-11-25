@@ -21,6 +21,7 @@ import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 //styled-component
 const Search = styled("div")(({ theme }) => ({
@@ -65,6 +66,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function AppHeader() {
+    const { data: session } = useSession();
+
     const router = useRouter();
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -95,16 +98,8 @@ export default function AppHeader() {
     const renderMenu = (
         <Menu
             anchorEl={anchorEl}
-            // anchorOrigin={{
-            //     vertical: "top",
-            //     horizontal: "right",
-            // }}
             id={menuId}
             keepMounted
-            // transformOrigin={{
-            //     vertical: "top",
-            //     horizontal: "right",
-            // }}
             open={isMenuOpen}
             onClose={handleMenuClose}
             transformOrigin={{ horizontal: "right", vertical: "top" }}
@@ -225,10 +220,22 @@ export default function AppHeader() {
                                 },
                             }}
                         >
-                            <Link href={"/playlist"}>Playlists</Link>
-                            <Link href={"/like"}>Likes</Link>
-                            <span>Upload</span>
-                            <Avatar onClick={handleProfileMenuOpen}>ER</Avatar>
+                            {
+                                session ? //fragment react
+                                    <>
+                                        <Link href={"/playlist"}>Playlists</Link>
+                                        <Link href={"/like"}>Likes</Link>
+                                        <span>Upload</span>
+                                        <Avatar
+                                            onClick={handleProfileMenuOpen}
+                                        >ER</Avatar>
+                                    </>
+                                    :
+                                    <>
+                                        <Link href={"/api/auth/signin"}>Login</Link>
+                                    </>
+                            }
+
                         </Box>
                         <Box sx={{ display: { xs: "flex", md: "none" } }}>
                             <IconButton
