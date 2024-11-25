@@ -68,7 +68,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function AppHeader() {
     const { data: session } = useSession();
-    console.log(session);
+    // console.log(session);
 
     const router = useRouter();
 
@@ -236,9 +236,11 @@ export default function AppHeader() {
                                     </>
                                     :
                                     <>
-                                        <Link href={"#"}
-                                            onClick={() => signIn()}
-                                        >Login</Link>
+                                        <Link
+                                            href={"/auth/signin"}
+                                        >
+                                            Login
+                                        </Link>
                                     </>
                             }
 

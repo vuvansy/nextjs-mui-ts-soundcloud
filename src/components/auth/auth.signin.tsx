@@ -9,7 +9,10 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import { useState } from "react";
+
+
 const AuthSignIn = (props: any) => {
+
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -17,6 +20,7 @@ const AuthSignIn = (props: any) => {
     const [isErrorPassword, setIsErrorPassword] = useState<boolean>(false);
     const [errorUsername, setErrorUsername] = useState<string>("");
     const [errorPassword, setErrorPassword] = useState<string>("");
+
     const handleSubmit = () => {
         setIsErrorUsername(false);
         setIsErrorPassword(false);
@@ -34,6 +38,7 @@ const AuthSignIn = (props: any) => {
         }
         console.log(">>> check username: ", username, ' pass: ', password)
     }
+
     return (
         <Box
             sx={{
@@ -98,6 +103,7 @@ const AuthSignIn = (props: any) => {
                             type={showPassword ? "text" : "password"}
                             error={isErrorPassword}
                             helperText={errorPassword}
+                            
                             InputProps={{
                                 endAdornment: <InputAdornment position="end">
                                     <IconButton onClick={() => setShowPassword(!showPassword)}>
@@ -131,6 +137,9 @@ const AuthSignIn = (props: any) => {
                                 sx={{
                                     cursor: "pointer",
                                     bgcolor: "orange"
+                                }}
+                                onClick={() => {
+                                    signIn("github")
                                 }}
                             >
                                 <GitHubIcon titleAccess="Login with Github" />

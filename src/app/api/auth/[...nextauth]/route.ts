@@ -92,7 +92,12 @@ export const authOptions: AuthOptions = {
             }
             return session;
         }
-    }
+    },
+    // pages: {
+    //     signIn: "auth/signin"
+    // }
+
+
 }
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST }
