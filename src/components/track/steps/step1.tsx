@@ -8,6 +8,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useCallback } from 'react';
 import { useSession } from "next-auth/react";
 import { sendRequestFile } from '@/utils/api';
+import axios from 'axios';
 
 const VisuallyHiddenInput = styled('input')({
     clip: 'rect(0 0 0 0)',
@@ -42,16 +43,32 @@ const Step1 = () => {
             const audio = acceptedFiles[0];
             const formData = new FormData()
             formData.append('fileUpload', audio);
-            const chills = await sendRequestFile<IBackendRes<ITrackTop[]>>({
-                url: "http://localhost:8000/api/v1/files/upload",
-                method: "POST",
-                body: formData,
-                headers: {
-                    'Authorization': `Bearer ${session?.access_token}`,
-                    "target_type": 'tracks'
-                },
-            })
-            console.log(">>> check audio: ", session?.access_token)
+
+            // const chills = await sendRequestFile<IBackendRes<ITrackTop[]>>({
+            //     url: "http://localhost:8000/api/v1/files/upload",
+            //     method: "POST",
+            //     body: formData,
+            //     headers: {
+            //         'Authorization': `Bearer ${session?.access_token}`,
+            //         "target_type": 'tracks'
+            //     },
+            // })
+            // console.log(">>> check audio: ", session?.access_token)
+
+            try {
+                const res = await axios.post("http://localhost:8000/api/v1/files/upload", formData,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${session?.access_token}`,
+                            "target_type": 'tracks'
+                        }
+                    })
+                console.log(">>> check audio: ", res.data.data.fileName)
+            } catch (error) {
+                //@ts-ignore
+                alert(error?.response?.data?.message)
+            }
+
         }
     }, [session])
 
