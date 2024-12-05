@@ -3,15 +3,28 @@ import { useTrackContext } from '@/lib/track.wrapper';
 import { useHasMounted } from '@/utils/customHook';
 import { Container } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
+import { useRef } from 'react';
 import AudioPlayer from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
 
 const AppFooter = () => {
+    const playerRef = useRef(null); //Thao tác với html của AudioPlayer
+
     const hasMounted = useHasMounted();
     if (!hasMounted) return (<></>)//fragment
 
     const { currentTrack, setCurrentTrack } = useTrackContext() as ITrackContext;
     console.log(">>> check currentTrack: ", currentTrack)
+
+    //@ts-ignore
+    if (currentTrack?.isPlaying) {
+        //@ts-ignore
+        playerRef?.current?.audio?.current?.play();
+    } else {
+        //@ts-ignore
+        playerRef?.current?.audio?.current?.pause();
+    }
+
 
     return (
         <div style={{ marginTop: 50 }}>
@@ -28,12 +41,19 @@ const AppFooter = () => {
                     }
                 }}>
                     <AudioPlayer
+                        ref={playerRef}
                         layout='horizontal-reverse'
-                        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/tracks/hoidanit.mp3`}
+                        src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/tracks/${currentTrack.trackUrl}`}
                         volume={0.5}
                         style={{
                             boxShadow: "unset",
                             background: "#f2f2f2"
+                        }}
+                        onPlay={() => {
+                            setCurrentTrack({ ...currentTrack, isPlaying: true })
+                        }}
+                        onPause={() => {
+                            setCurrentTrack({ ...currentTrack, isPlaying: false })
                         }}
                     />
                     <div style={{
