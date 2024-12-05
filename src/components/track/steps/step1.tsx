@@ -57,7 +57,7 @@ const Step1 = (props: IProps) => {
                         headers: {
                             Authorization: `Bearer ${session?.access_token}`,
                             "target_type": 'tracks',
-                            delay: 5000
+                            
                         },
                         //Fc lấy ra % upload
                         onUploadProgress: progressEvent => {
@@ -69,10 +69,10 @@ const Step1 = (props: IProps) => {
                             })
                         }
                     })
-                props.setTrackUpload({
-                    ...trackUpload,
+                props.setTrackUpload((prevState: any) => ({ //Lấy lại giá trị state trước đó(chờ setTrackUpload phía tên set state xong)
+                    ...prevState,
                     uploadedTrackName: res.data.data.fileName
-                })
+                }))
 
             } catch (error) {
                 //@ts-ignore

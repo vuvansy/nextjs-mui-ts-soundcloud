@@ -11,6 +11,8 @@ import TextField from '@mui/material/TextField';
 import MenuItem from '@mui/material/MenuItem';
 import axios from 'axios';
 import { useSession } from "next-auth/react";
+import { sendRequest } from '@/utils/api';
+import { useToast } from '@/utils/toast';
 
 function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
     return (
@@ -49,6 +51,7 @@ const VisuallyHiddenInput = styled('input')({
 function InputFileUpload(props: any) {
     const { setInfo, info } = props;
     const { data: session } = useSession();
+    const toast = useToast()
 
     const handleUpload = async (image: any) => {
         const formData = new FormData()
@@ -67,7 +70,8 @@ function InputFileUpload(props: any) {
             })
         } catch (error) {
             //@ts-ignore
-            alert(error?.response?.data?.message)
+            toast.error(error?.response?.data?.message)
+            // alert(error?.response?.data?.message)
         }
     }
 
@@ -92,6 +96,7 @@ interface IProps {
         percent: number;
         uploadedTrackName: string;
     }
+    setValue: (v: number) => void;
 }
 
 interface INewTrack {
@@ -103,7 +108,9 @@ interface INewTrack {
 }
 
 const Step2 = (props: IProps) => {
-    const { trackUpload } = props;
+    const { data: session } = useSession();
+    const { trackUpload, setValue } = props;
+    const toast = useToast();
     // console.log(">>> check trackUpload: ", trackUpload)
 
     const [info, setInfo] = React.useState<INewTrack>({
@@ -139,8 +146,28 @@ const Step2 = (props: IProps) => {
         }
     ];
 
-    const handleSubmitForm = () => {
-        console.log(">>> check info: ", info)
+    const handleSubmitForm = async () => {
+        const res = await sendRequest<IBackendRes<ITrackTop[]>>({
+            url: "http://localhost:8000/api/v1/tracks",
+            method: "POST",
+            body: {
+                title: info.title,
+                description: info.description,
+                trackUrl: info.trackUrl,
+                imgUrl: info.imgUrl,
+                category: info.category,
+            },
+            headers: {
+                Authorization: `Bearer ${session?.access_token}`,
+            },
+        })
+        if (res.data) {
+            setValue(0)
+            toast.success("Create a new track success!")
+        } else {
+            toast.error(res.message)
+            // alert(res.message)
+        }
     }
 
     return (
@@ -149,7 +176,7 @@ const Step2 = (props: IProps) => {
                 <div>
                     {trackUpload.fileName}
                 </div>
-                <LinearWithValueLabel trackUpload={trackUpload} />
+                <LinearWithValueLabel trackUpload={trackUpload} setValue={setValue} />
             </div>
             <Grid container spacing={2} mt={5}>
                 <Grid item xs={6} md={4}
