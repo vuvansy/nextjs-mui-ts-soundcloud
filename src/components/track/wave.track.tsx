@@ -9,8 +9,13 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import { Tooltip } from "@mui/material";
 import { sendRequest } from "@/utils/api";
+import { useTrackContext } from "@/lib/track.wrapper";
 
-const WaveTrack = () => {
+interface IProps {
+    track: ITrackTop | null;
+}
+const WaveTrack = (props: IProps) => {
+    const { track } = props;
     const containerRef = useRef<HTMLDivElement>(null);
     const hoverRef = useRef<HTMLDivElement>(null);
     const [time, setTime] = useState<string>("0:00");
@@ -18,7 +23,8 @@ const WaveTrack = () => {
 
     const searchParams = useSearchParams()
     const fileName = searchParams.get('audio');
-    const id = searchParams.get('id');
+
+    const { currentTrack, setCurrentTrack } = useTrackContext() as ITrackContext;
 
     //Biến số được sử dụng với useMemo Giữ nguyên địa chỉ bộ nhớ và giá trị mỗi lần render
     const optionsMemo = useMemo((): Omit<WaveSurferOptions, 'container'> => {
@@ -58,7 +64,6 @@ const WaveTrack = () => {
     const wavesurfer = useWavesurfer(containerRef, optionsMemo);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
-    const [trackInfo, setTrackInfo] = useState<ITrackTop | null>(null);
     // Initialize wavesurfer when the container mounts
     // or any of the props change
     useEffect(() => {
@@ -90,18 +95,6 @@ const WaveTrack = () => {
         }
     }, [wavesurfer])
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const res = await sendRequest<IBackendRes<ITrackTop>>({
-                url: `http://localhost:8000/api/v1/tracks/${id}`,
-                method: "GET",
-            })
-            if (res && res.data) {
-                setTrackInfo(res.data)
-            }
-        }
-        fetchData();
-    }, [id])
 
     // On play button click
     //useCallback không chạy lại khối code nếu biến số không thay đổi
@@ -149,6 +142,17 @@ const WaveTrack = () => {
         return `${percent}%`
     }
 
+    useEffect(() => {
+        if (wavesurfer && currentTrack.isPlaying) {
+            wavesurfer.pause();
+        }
+    }, [currentTrack])
+    
+    useEffect(() => {
+        if (track?._id && !currentTrack?._id)
+            setCurrentTrack({ ...track, isPlaying: false })
+    }, [track])
+
     return (
         <div style={{ marginTop: 20 }}>
             <div
@@ -172,7 +176,12 @@ const WaveTrack = () => {
                     <div className="info" style={{ display: "flex" }}>
                         <div>
                             <div
-                                onClick={() => onPlayClick()}
+                                onClick={() => {
+                                    onPlayClick();
+                                    if (track && wavesurfer) {
+                                        setCurrentTrack({ ...currentTrack, isPlaying: false })
+                                    }
+                                }}
                                 style={{
                                     borderRadius: "50%",
                                     background: "#f50",
@@ -203,7 +212,7 @@ const WaveTrack = () => {
                                 width: "fit-content",
                                 color: "white"
                             }}>
-                                {trackInfo?.title}
+                                {track?.title}
                             </div>
                             <div style={{
                                 padding: "0 5px",
@@ -214,7 +223,7 @@ const WaveTrack = () => {
                                 color: "white"
                             }}
                             >
-                                {trackInfo?.description}
+                                {track?.description}
                             </div>
                         </div>
                     </div>
